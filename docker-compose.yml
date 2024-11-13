@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    depends_on:
+      - sqlserver
+      - elasticsearch
+    environment:
+      - DATABASE_URL=mssql+pyodbc://sa:StrongP@ssw0rd123@sqlserver:1433/Covid?driver=ODBC+Driver+17+for+SQL+Server
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    links:
+      - sqlserver
+      - elasticsearch
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=StrongP@ssw0rd123
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.10.2
+    environment:
+      - discovery.type=single-node
+    ports:
+      - "9200:9200"
+
+volumes:
+  sqlserver_data:

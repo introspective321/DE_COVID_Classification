@@ -1,49 +1,36 @@
-from ingestion import ingest_data
-from reliability_checks import apply_reliability_checks
+from ingestion import load_csv
 from data_cleaning import clean_data
-from normalization import normalize_subject_data, normalize_temperature_data, normalize_environment_data
+from reliability_checks import apply_reliability_checks
+from normalization import normalize_subject_data, normalize_measurement_data
 from database_setup import setup_database
+from save_to_database import save_to_database
 from elasticsearch_setup import setup_elasticsearch
-
-# File paths
-file_paths = {
-    "ici_group1": "data/ICI_group1.csv",
-    "ici_group2": "data/ICI_group2.csv",
-    # Add other file paths...
-}
-
-# Critical columns and range thresholds for reliability checks
-critical_columns = ['T_CRmax', 'T_CLmax']  # Add more as needed
-column_ranges = {
-    'T_CRmax': (30.0, 40.0),
-    'T_CLmax': (30.0, 40.0),
-    # Define other ranges...
-}
+from utils.config import DATABASE_URL, ELASTICSEARCH_URL
 
 def run_pipeline():
-    """Run the complete pipeline end-to-end."""
-    # Step 1: Database and Elasticsearch setup
+    # Step 1: Set up database and Elasticsearch
     setup_database()
-    setup_elasticsearch()
+    setup_elasticsearch(ELASTICSEARCH_URL)
     
-    # Step 2: Ingest data
-    ingest_data(file_paths)
+    # Step 2: Load data
+    file_path = "data/ICI_group1.csv"
+    df = load_csv(file_path)
     
-    # Step 3: Data Cleaning and Reliability Checks
-    for table_name in file_paths.keys():
-        df = ingest_data(file_paths[table_name])
-        df = clean_data(df, date_column='Date', columns_to_fill=critical_columns)
-        df = apply_reliability_checks(df, critical_columns, column_ranges)
+    # Step 3: Clean data
+    df = clean_data(df)
     
-        # Step 4: Normalize Data
-        subject_df = normalize_subject_data(df)
-        temperature_df = normalize_temperature_data(df)
-        environment_df = normalize_environment_data(df)
+    # Step 4: Apply reliability checks
+    column_ranges = {'T_CRmax': (30, 40), 'T_CLmax': (30, 40)}
+    df = apply_reliability_checks(df, column_ranges)
     
-        # Step 5: Save Normalized Data to Database
-        save_to_database(subject_df, "subjects")
-        save_to_database(temperature_df, "temperatures")
-        save_to_database(environment_df, "environment")
+    # Step 5: Normalize data and save to SQL Server
+    subject_df = normalize_subject_data(df)
+    measurement_df = normalize_measurement_data(df)
+    
+    save_to_database(subject_df, "subjects")
+    save_to_database(measurement_df, "measurements")
+    
+    print("Pipeline completed successfully.")
 
 if __name__ == "__main__":
     run_pipeline()

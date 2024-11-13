@@ -1,3 +1,8 @@
 pandas
 sqlalchemy
 elasticsearch
+pyodbc
+pandas
+numpy
+sqlalchemy
+elasticsearch
