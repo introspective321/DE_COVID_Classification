@@ -64,3 +64,20 @@ This project processes and analyzes thermal imaging data and associated clinical
 ├── docker-compose.yml      # Docker Compose file for multi-container setup
 ├── requirements.txt        # Python dependencies
 ├── README.md               # Comprehensive documentation
+
+
+---
+
+## Technologies Used
+
+- **Programming Language**: Python 3.9
+- **Relational Database**: SQL Server 2019
+- **Search Engine**: Elasticsearch 7.10.2
+- **Containerization**: Docker and Docker Compose
+- **Machine Learning**: Pretrained ML models for inference
+- **Libraries**:
+  - `pandas`, `sqlalchemy`, `pyodbc` for data handling
+  - `elasticsearch-py` for Elasticsearch integration
+  - `pytest` for unit testing
+
+---
