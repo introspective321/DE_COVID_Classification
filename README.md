@@ -64,8 +64,7 @@ This project processes and analyzes thermal imaging data and associated clinical
 ├── docker-compose.yml      # Docker Compose file for multi-container setup
 ├── requirements.txt        # Python dependencies
 ├── README.md               # Comprehensive documentation
-
-
+```
 ---
 
 ## Technologies Used
